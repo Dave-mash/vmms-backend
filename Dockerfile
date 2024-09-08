@@ -37,12 +37,16 @@ COPY --from=base /app/dist/ ./dist/
 COPY --from=base /app/prisma ./prisma
 COPY --from=base /app/tsconfig.build.json ./tsconfig.build.json
 COPY --from=base /app/prisma/migrations ./prisma/migrations
+COPY --from=base /app/run_migrations.sh ./run_migrations.sh
+
+# Run migrations
+RUN chmod +x ./run_migrations.sh
 
 # Expose the necessary ports
-EXPOSE 3001
+EXPOSE 3000
 
 # Entry point script
-ENTRYPOINT ["./run_migrations.sh"]
+# ENTRYPOINT ["./run_migrations.sh"]
 
 # Run your Nest app in production
-CMD [ "node", "dist/apps/collection/main.js"]
+CMD [ "node", "dist/main.js"]
