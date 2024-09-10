@@ -1,59 +1,29 @@
 name: Deploy to Staging
 
+env:
+  APP_NAME: vmms-backend
+  GHCR_REPOSITORY: vmms-backend
+
 on:
   push:
     branches:
       - main
 
-env:
-  AWS_REGION: eu-west-3 # set this to your preferred AWS region, e.g. us-west-3
-  ECR_REPOSITORY: vmms-backend # set this to the name of your ECR repository
-  APP_NAME: vmms-backend # set this to the name of your CapRover app
-
 jobs:
-  deploy:
-    name: Deploy
+  build_and_publish:
     runs-on: ubuntu-latest
-    environment: staging
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
+      - uses: actions/checkout@v4
 
       - name: Prepare environment variables
         run: |
           APP_NAME_SANITIZED=$(echo "${{ env.APP_NAME }}" | tr ':' '-')
-          IMAGE_TAG="${APP_NAME_SANITIZED}-$(date '+%H%M%S-%d-%m-%Y')"
+          IMAGE_TAG="$(date '+%H%M%S-%d-%m-%Y')"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           echo "APP_NAME_SANITIZED=$APP_NAME_SANITIZED" >> $GITHUB_ENV
 
-      - name: Build, tag, and push image to Amazon ECR (Container Registry)
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      - name: Build and push the image
         run: |
-          # Build a docker container and
-          # push it to ECR so that it can
-          # be deployed to ECS.
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "FULL_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
-
-      - name: Deploy Image to CapRover
-        uses: caprover/deploy-from-github@v1.1.2
-        with:
-          server: '${{ secrets.CAPROVER_SERVER }}'
-          app: '${{ env.APP_NAME }}-staging'
-          token: '${{ secrets.APP_TOKEN }}'
-          image: ${{ env.FULL_IMAGE_NAME }}
+          docker login --username GITHUBUSERNAME --password ${{ secrets.GH_PAT }} ghcr.io
+          docker build -f ./docker/prod.Dockerfile -t $GHCR_REPOSITORY:$IMAGE_TAG --tag ghcr.io/dave-mash/vmms-backend:latest .
+          docker push ghcr.io/dave-mash/vmms-backend:latest
