@@ -1,5 +1,6 @@
 FROM node:18-alpine as base
 
+LABEL org.opencontainers.image.description DESCRIPTION
 # Set the NODE_ENV to 'build' for the builder stage
 ENV NODE_ENV build
 
