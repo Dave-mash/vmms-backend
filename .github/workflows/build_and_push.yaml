@@ -22,7 +22,7 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           echo "APP_NAME_SANITIZED=$APP_NAME_SANITIZED" >> $GITHUB_ENV
 
-      - name: Build and push the image
+      - name: Build and push the image to ghcr
         run: |
           docker login --username GITHUBUSERNAME --password ${{ secrets.GH_PAT }} ghcr.io
           docker build -f ./docker/prod.Dockerfile -t $GHCR_REPOSITORY:$IMAGE_TAG --tag ghcr.io/dave-mash/vmms-backend:latest .
