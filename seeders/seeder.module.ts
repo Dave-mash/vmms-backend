@@ -24,5 +24,18 @@ export class SeederModule {
     if (!guest) {
       guest = await this.prisma.user_profile.create({ data });
     }
+    const { tsid: link_user } = guest;
+    const role = await this.prisma.user_role.findUnique({
+      where: { link_user },
+    });
+    if (!role) {
+      await this.prisma.user_role.create({
+        data: {
+          link_user,
+          tsid: generateTSID(),
+          role_type: 'Guest',
+        },
+      });
+    }
   }
 }

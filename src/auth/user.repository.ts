@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { user_profile } from '@prisma/client';
+import { generateTSID } from 'packages/shared-packages/src/utils';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -10,6 +11,16 @@ export class UserRepository {
     const user = await this.app?.user_profile?.create({
       data: { ...data },
     });
+    if (!user) {
+      const { tsid: link_user } = user;
+      await this.app.user_role.create({
+        data: {
+          link_user,
+          tsid: generateTSID(),
+          role_type: 'Guest',
+        },
+      });
+    }
 
     return user;
   }

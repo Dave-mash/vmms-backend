@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Post } from '@nestjs/common';
+import { Injectable, NotFoundException, Post } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UserRepository } from './user.repository';
 import { generateTSID } from 'packages/shared-packages/src/utils';
@@ -11,31 +11,34 @@ export class AuthService {
   async createUser(userPayload: CreateAuthDto) {
     try {
       const { username } = userPayload;
-      const existingUser = await this.userRepository.getUserByUsername(
+      let user = await this.userRepository.getUserByUsername(
         username.toLowerCase(),
       );
-      if (!existingUser) {
+      if (!user) {
         const payload = {
           ...userPayload,
           tsid: generateTSID(),
           username: username.toLowerCase(),
         };
-        await this.userRepository.createUser(payload);
+        const newUser = await this.userRepository.createUser(payload);
       } else {
         const payload = {
           ...userPayload,
           username: username.toLowerCase(),
         };
-        console.log(payload);
-        await this.userRepository.updateUser(username.toLowerCase(), payload);
+        user = await this.userRepository.updateUser(
+          username.toLowerCase(),
+          payload,
+        );
       }
 
       return {
         msg: 'Success',
+        user,
       };
     } catch (e) {
       console.log(':::::::::: ', e);
-      throw new BadRequestException('An error occured!');
+      throw new NotFoundException('Resource not found!');
     }
   }
   create() {

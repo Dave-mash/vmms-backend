@@ -8,6 +8,15 @@ datasource db {
   url      = env("VMMS_DATABASE_URL")
 }
 
+model organisation {
+  id          Int      @id @default(autoincrement())
+  tsid        String   @default("")
+  name        String   @default("")
+  active      Boolean  @default(true)
+  created_at  DateTime @default(now())
+  modified_at DateTime @updatedAt
+}
+
 model user_profile {
   id                Int      @id @default(autoincrement())
   tsid              String   @default("")
@@ -23,7 +32,7 @@ model subscription {
   id                Int      @id @default(autoincrement())
   tsid              String   @default("")
   subscription_type String   @default("")
-  link_user         String   @default("") // tsid
+  link_organisation String   @default("") // tsid
   created_at        DateTime @default(now())
   modified_at       DateTime @updatedAt
 }
@@ -31,8 +40,8 @@ model subscription {
 model user_role {
   id          Int      @id @default(autoincrement())
   tsid        String   @default("")
-  role_type   String   @default("")
-  link_user   String   @default("") // tsid
+  role_type   String   @default("") // Guest | User | Admin
+  link_user   String   @unique // tsid
   created_at  DateTime @default(now())
   modified_at DateTime @updatedAt
 }
