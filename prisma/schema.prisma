@@ -10,7 +10,6 @@ datasource db {
 
 model user_profile {
   id                Int      @id @default(autoincrement())
-  uuid              String   @unique @default(uuid()) @map("uuid")
   tsid              String   @default("")
   full_name         String   @default("")
   username          String   @unique
@@ -22,7 +21,6 @@ model user_profile {
 
 model subscription {
   id                Int      @id @default(autoincrement())
-  uuid              String   @unique @default(uuid()) @map("uuid")
   tsid              String   @default("")
   subscription_type String   @default("")
   link_user         String   @default("") // tsid
@@ -30,9 +28,8 @@ model subscription {
   modified_at       DateTime @updatedAt
 }
 
-model user_roles {
+model user_role {
   id          Int      @id @default(autoincrement())
-  uuid        String   @unique @default(uuid()) @map("uuid")
   tsid        String   @default("")
   role_type   String   @default("")
   link_user   String   @default("") // tsid

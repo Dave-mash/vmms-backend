@@ -10,22 +10,18 @@ export class AuthService {
   @Post()
   async createUser(userPayload: CreateAuthDto) {
     try {
-      console.log(':::::::::: 0.');
       const { username } = userPayload;
       const existingUser = await this.userRepository.getUserByUsername(
         username.toLowerCase(),
       );
-      console.log(':::::::::: 1.');
       if (!existingUser) {
         const payload = {
           ...userPayload,
           tsid: generateTSID(),
           username: username.toLowerCase(),
         };
-        console.log(':::::::::: 2.');
         await this.userRepository.createUser(payload);
       } else {
-        console.log(':::::::::: 3.');
         const payload = {
           ...userPayload,
           username: username.toLowerCase(),
