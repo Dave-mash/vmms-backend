@@ -1,29 +1,41 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "windows", "debian-openssl-1.1.x"]
 }
 
-// this is the fms client db
 datasource db {
   provider = "postgresql"
   url      = env("VMMS_DATABASE_URL")
 }
 
-// replace uuid with tsid
 model user_profile {
   id                Int      @id @default(autoincrement())
   uuid              String   @unique @default(uuid()) @map("uuid")
   tsid              String   @default("")
   full_name         String   @default("")
   username          String   @unique
-  phone             String?  @unique
-  email             String?  @unique
-  active            Boolean
-  is_email_verified Boolean?
-  password          String   @unique
+  active            Boolean  @default(true)
+  is_email_verified Boolean? @default(false)
   created_at        DateTime @default(now())
   modified_at       DateTime @updatedAt
+}
+
+model subscription {
+  id                Int      @id @default(autoincrement())
+  uuid              String   @unique @default(uuid()) @map("uuid")
+  tsid              String   @default("")
+  subscription_type String   @default("")
+  link_user         String   @default("") // tsid
+  created_at        DateTime @default(now())
+  modified_at       DateTime @updatedAt
+}
+
+model user_roles {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid()) @map("uuid")
+  tsid        String   @default("")
+  role_type   String   @default("")
+  link_user   String   @default("") // tsid
+  created_at  DateTime @default(now())
+  modified_at DateTime @updatedAt
 }
