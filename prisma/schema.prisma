@@ -10,7 +10,7 @@ datasource db {
 
 model organisation {
   id          Int      @id @default(autoincrement())
-  tsid        String   @default("")
+  tsid        String   @unique
   name        String   @default("")
   active      Boolean  @default(true)
   created_at  DateTime @default(now())
@@ -19,7 +19,7 @@ model organisation {
 
 model user_profile {
   id                Int      @id @default(autoincrement())
-  tsid              String   @default("")
+  tsid              String   @unique
   full_name         String   @default("")
   username          String   @unique
   active            Boolean  @default(true)
@@ -31,17 +31,66 @@ model user_profile {
 model subscription {
   id                Int      @id @default(autoincrement())
   tsid              String   @default("")
-  subscription_type String   @default("")
-  link_organisation String   @default("") // tsid
+  subscription_type String   @default("") // platinum, gold, silver, bronze
+  link_organisation String   @unique // tsid
+  active            Boolean  @default(false)
   created_at        DateTime @default(now())
   modified_at       DateTime @updatedAt
 }
 
 model user_role {
-  id          Int      @id @default(autoincrement())
-  tsid        String   @default("")
-  role_type   String   @default("") // Guest | User | Admin
-  link_user   String   @unique // tsid
-  created_at  DateTime @default(now())
-  modified_at DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  tsid              String   @default("")
+  role_type         String   @default("") // Guest | User | Admin
+  link_user         String   @unique // tsid
+  link_organisation String   @default("")
+  created_at        DateTime @default(now())
+  modified_at       DateTime @updatedAt
+}
+
+model instance {
+  id                Int      @id @default(autoincrement())
+  tsid              String   @default("")
+  name              String   @default("") // Guest | User | Admin
+  vm_id             String   @unique
+  description       String   @default("")
+  status            String   @default("") // running, stopped, suspended, terminated
+  image_name        String   @default("")
+  private_ip        String   @default("")
+  public_ip         String   @default("")
+  mac_address       String   @default("")
+  storage_type      String   @default("")
+  storage_size      String   @default("")
+  link_organisation String   @default("")
+  created_at        DateTime @default(now())
+  modified_at       DateTime @updatedAt
+}
+
+model vm_audit_log {
+  id            Int      @id @default(autoincrement())
+  tsid          String   @default("")
+  activity_type String   @default("") // MOVE | User | Admin
+  link_user     String   @default("") // tsid
+  link_org      String   @default("") // tsid
+  link_instance String   @default("")
+  created_at    DateTime @default(now())
+  modified_at   DateTime @updatedAt
+}
+
+model payment {
+  id                         Int      @id @default(autoincrement())
+  tsid                       String   @default("")
+  payment_type               String   @default("") // Bank | MPesa
+  link_user                  String   @default("") // tsid
+  link_organisation          String   @default("")
+  transaction_ref_no         String   @default("") // targetRefNumber
+  receiver_bank_code         String   @default("")
+  receiver_account_full_name String   @default("")
+  receiver_account_no        String   @default("")
+  sender_name                String   @default("")
+  sender_account_no          String   @default("")
+  narration                  String   @default("")
+  tranCCY                    String   @default("")
+  created_at                 DateTime @default(now())
+  modified_at                DateTime @updatedAt
 }

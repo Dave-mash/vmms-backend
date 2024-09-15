@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Patch,
   Param,
   Delete,
@@ -10,10 +9,12 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './auth.guard';
+import { UserGuard } from './user.guard';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Controller('auth')
@@ -21,19 +22,27 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Post()
-  async create(@Body() createAuthDto: CreateAuthDto) {
-    const newUser = await this.authService.createUser(createAuthDto);
+  @UseGuards(UserGuard)
+  @Post('login')
+  async userLogin(@Request() req: any) {
+    const current_user = req?.current_user;
+    const newUser = await this.authService.userLogin(current_user);
+    // response.cookie('vmms:session', 'your_token_value', {
+    //   httpOnly: false, // Set to true if you want it to be HttpOnly
+    //   secure: false, // Set to true in production if using HTTPS
+    //   maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
+    //   path: '/', // Path for which the cookie is valid
+    // });
 
     return newUser;
   }
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll(@Request() req: any) {
+  async findAll(@Request() req: any) {
     const current_user = req?.current_user;
     console.log('Here we go...', current_user);
-    return this.authService.findAll();
+    return current_user;
   }
 
   @Get(':id')

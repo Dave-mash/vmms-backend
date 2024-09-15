@@ -11,13 +11,13 @@ export class UserRepository {
     const user = await this.app?.user_profile?.create({
       data: { ...data },
     });
-    if (!user) {
+    if (!!user) {
       const { tsid: link_user } = user;
       await this.app.user_role.create({
         data: {
           link_user,
           tsid: generateTSID(),
-          role_type: 'Guest',
+          role_type: 'Admin',
         },
       });
     }

@@ -1,44 +1,30 @@
-import { Injectable, NotFoundException, Post } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { generateTSID } from 'packages/shared-packages/src/utils';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  @Post()
-  async createUser(userPayload: CreateAuthDto) {
+  async userLogin(userPayload: any) {
     try {
-      const { username } = userPayload;
-      let user = await this.userRepository.getUserByUsername(
-        username.toLowerCase(),
-      );
-      if (!user) {
-        const payload = {
-          ...userPayload,
-          tsid: generateTSID(),
-          username: username.toLowerCase(),
-        };
-        const newUser = await this.userRepository.createUser(payload);
-      } else {
-        const payload = {
-          ...userPayload,
-          username: username.toLowerCase(),
-        };
-        user = await this.userRepository.updateUser(
-          username.toLowerCase(),
-          payload,
-        );
-      }
+      const payload = { sub: userPayload?.tsid };
+      const sys_access_token = await this.jwtService.signAsync(payload, {
+        secret: jwtConstants.secret,
+        expiresIn: '60m',
+      });
 
       return {
         msg: 'Success',
-        user,
+        access_token: sys_access_token,
       };
     } catch (e) {
       console.log(':::::::::: ', e);
-      throw new NotFoundException('Resource not found!');
+      throw new BadRequestException('Resource not found!');
     }
   }
   create() {
