@@ -15,10 +15,10 @@ export class SeederModule {
     const data = {
       full_name: 'Guest',
       tsid: generateTSID(),
-      username: 'Guest',
+      username: 'guest',
     };
     let guest = await this.prisma.user_profile.findUnique({
-      where: { username: 'Guest' },
+      where: { username: 'guest' },
     });
 
     if (!guest) {

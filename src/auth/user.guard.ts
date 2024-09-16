@@ -31,7 +31,17 @@ export class UserGuard implements CanActivate {
           'X-GitHub-Api-Version': '2022-11-28',
         },
       };
-      const response = await axios.get(githubProfileURL, headers);
+      const guestUser = access_token === 'Guest';
+      const guestPayload = {
+        data: {
+          login: 'Guest',
+          name: 'Guest',
+        },
+      };
+      let response = null;
+      response = guestUser
+        ? guestPayload
+        : await axios.get(githubProfileURL, headers);
       console.log('::::::::: HERE IS THE RESOPONSE: ', response);
       const { login: username, name: full_name } = response?.data;
       // let current_user = await this.userRepository.getUserByUsername(
