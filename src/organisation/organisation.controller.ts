@@ -8,6 +8,7 @@ import {
   UseGuards,
   ValidationPipe,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
@@ -28,9 +29,16 @@ export class OrganisationController {
     @Body() createInstancePayload: CreateOrgDto,
     @Request() req: any,
   ) {
-    const current_user = req?.current_user;
+    const currentUser = req?.current_user;
+    const {
+      role: { role_type },
+    } = currentUser;
+    const validRoles = ['Admin'];
+    if (!validRoles.includes(role_type)) {
+      throw new BadRequestException('Authorization failure!');
+    }
     const newOrg = await this.organisationService.createOrganisation(
-      current_user,
+      currentUser,
       createInstancePayload,
     );
 

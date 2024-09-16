@@ -6,6 +6,7 @@ import {
   HttpCode,
   UseGuards,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { VMInstanceService } from './instance.service';
 import { Role } from 'src/auth/role.enum';
@@ -21,9 +22,17 @@ export class VMInstanceController {
   @Post('create')
   @Roles(Role.Admin)
   async createNewVM(@Body() createInstancePayload: any, @Request() req: any) {
-    const current_user = req?.current_user;
+    const currentUser = req?.current_user;
+    const {
+      role: { role_type },
+    } = currentUser;
+    const validRoles = ['Admin'];
+    if (!validRoles.includes(role_type)) {
+      throw new BadRequestException('Authorization failure!');
+    }
+
     const newUser = await this.instanceService.createInstance(
-      current_user,
+      currentUser,
       createInstancePayload,
     );
 
