@@ -9,12 +9,13 @@ datasource db {
 }
 
 model organisation {
-  id          Int      @id @default(autoincrement())
-  tsid        String   @unique
-  name        String   @default("")
-  active      Boolean  @default(true)
-  created_at  DateTime @default(now())
-  modified_at DateTime @updatedAt
+  id                 Int      @id @default(autoincrement())
+  tsid               String   @unique
+  name               String   @default("")
+  payment_identifier String   @default("")
+  active             Boolean  @default(true)
+  created_at         DateTime @default(now())
+  modified_at        DateTime @updatedAt
 }
 
 model user_profile {
@@ -78,19 +79,15 @@ model vm_audit_log {
 }
 
 model payment {
-  id                         Int      @id @default(autoincrement())
-  tsid                       String   @default("")
-  payment_type               String   @default("") // Bank | MPesa
-  link_user                  String   @default("") // tsid
-  link_organisation          String   @default("")
-  transaction_ref_no         String   @default("") // targetRefNumber
-  receiver_bank_code         String   @default("")
-  receiver_account_full_name String   @default("")
-  receiver_account_no        String   @default("")
-  sender_name                String   @default("")
-  sender_account_no          String   @default("")
-  narration                  String   @default("")
-  tranCCY                    String   @default("")
-  created_at                 DateTime @default(now())
-  modified_at                DateTime @updatedAt
+  id                 Int      @id @default(autoincrement())
+  tsid               String   @default("")
+  payment_type       String   @default("") // Bank | MPesa
+  link_organisation  String   @default("")
+  transaction_ref_no String   @default("")
+  payment_mode       String   @default("")
+  amount             String   @default("")
+  account_no         String   @default("")
+  tranCCY            String   @default("")
+  created_at         DateTime @default(now())
+  modified_at        DateTime @updatedAt
 }

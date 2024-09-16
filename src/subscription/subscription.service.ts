@@ -47,7 +47,6 @@ export class SubscriptionService {
         await this.subscriptionRepository.createsubscription(
           subscriptionPayload,
         );
-
       return {
         msg: 'Success',
         newSubscription,

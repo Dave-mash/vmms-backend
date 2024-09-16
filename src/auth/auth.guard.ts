@@ -42,7 +42,7 @@ export class AuthGuard implements CanActivate {
         where: { tsid: role?.link_organisation },
       });
       const subscription = await this.prismaService.subscription.findFirst({
-        where: { link_organisation: organisation?.tsid, active: true },
+        where: { link_organisation: organisation?.tsid },
       });
       const userPayload: CreateAuthDto = plainToClass(CreateAuthDto, user);
       // userPayload['organisation'] = org;

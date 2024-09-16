@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -12,8 +13,15 @@ export class VMInstanceService {
   constructor(private instanceRepository: VMInstanceRepository) {}
 
   @Post()
-  async createInstance(instancePayload: any) {
+  async createInstance(current_user, instancePayload: any) {
     try {
+      const currentSubscription = current_user['subscription'];
+      console.log(':::::::::::::::: ', currentSubscription);
+      if (!currentSubscription?.active) {
+        throw new BadRequestException(
+          'Failed! Please upgrade your subscription to proceed.',
+        );
+      }
       const { name } = instancePayload;
       const existingVM = await this.instanceRepository.getInstanceByName(
         name.toLowerCase(),
@@ -22,6 +30,7 @@ export class VMInstanceService {
         throw new ConflictException('Please choose a different name.');
       }
       instancePayload['vm_id'] = uuidv4();
+      instancePayload['name'] = name.toLowerCase();
       const newInstance =
         await this.instanceRepository.createInstance(instancePayload);
 
@@ -33,7 +42,7 @@ export class VMInstanceService {
       };
     } catch (e) {
       console.log(':::::::::: ', e);
-      throw new NotFoundException('Resource not found!');
+      throw e;
     }
   }
 

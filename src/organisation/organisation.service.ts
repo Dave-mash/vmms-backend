@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { OrganisationRepository } from './organisation.repository';
 import { PrismaService } from 'src/prisma.service';
+import { generateRandomNumberString } from 'src/utils';
 
 @Injectable()
 export class OrganisationService {
@@ -14,7 +15,6 @@ export class OrganisationService {
     private prismaService: PrismaService,
   ) {}
 
-  @Post()
   async createOrganisation(current_user: any, orgPayload: any) {
     try {
       const { name, subscriptionPayload } = orgPayload;
@@ -22,12 +22,15 @@ export class OrganisationService {
         await this.organisationRepository.getOrganisationByName(
           name.toLowerCase(),
         );
+      console.log('::::::::::::: ');
       if (existingOrganisation) {
         throw new ConflictException(
           'Please choose a different organisation name.',
         );
       }
       orgPayload['name'] = orgPayload?.name?.toLowerCase();
+      orgPayload['payment_identifier'] = generateRandomNumberString();
+      console.log('::::::::::::::: ', orgPayload);
       const newOrganisation =
         await this.organisationRepository.createOrganisation(orgPayload);
       if (newOrganisation) {
