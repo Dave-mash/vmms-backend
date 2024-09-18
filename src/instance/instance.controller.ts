@@ -30,6 +30,7 @@ export class VMInstanceController {
     if (!validRoles.includes(role_type)) {
       throw new BadRequestException('Authorization failure!');
     }
+    console.log(':::::::::::: ', createInstancePayload);
 
     const newUser = await this.instanceService.createInstance(
       currentUser,

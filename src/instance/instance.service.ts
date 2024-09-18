@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  Post,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { VMInstanceRepository } from './instance.repository';
@@ -12,11 +11,11 @@ import { VMInstanceRepository } from './instance.repository';
 export class VMInstanceService {
   constructor(private instanceRepository: VMInstanceRepository) {}
 
-  @Post()
   async createInstance(current_user, instancePayload: any) {
     try {
       const currentSubscription = current_user['subscription'];
-      console.log(':::::::::::::::: ', currentSubscription);
+      const organisation = current_user['organisation'];
+      console.log(':::::::::::::::: ', instancePayload);
       if (!currentSubscription?.active) {
         throw new BadRequestException(
           'Failed! Please upgrade your subscription to proceed.',
@@ -31,6 +30,7 @@ export class VMInstanceService {
       }
       instancePayload['vm_id'] = uuidv4();
       instancePayload['name'] = name.toLowerCase();
+      instancePayload['link_organisation'] = organisation?.tsid;
       const newInstance =
         await this.instanceRepository.createInstance(instancePayload);
 
