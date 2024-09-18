@@ -50,4 +50,4 @@ EXPOSE 3000
 # ENTRYPOINT ["./run_migrations.sh"]
 
 # Run your Nest app in production
-CMD [ "node", "dist/main.js"]
+CMD [ "yarn", "start:dev"]
