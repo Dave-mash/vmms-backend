@@ -1,45 +1,30 @@
-import { BadRequestException, Injectable, Post } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { generateTSID } from 'packages/shared-packages/src/utils';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  @Post()
-  async createUser(userPayload: CreateAuthDto) {
+  async userLogin(userPayload: any) {
     try {
-      console.log(':::::::::: 0.');
-      const { username } = userPayload;
-      const existingUser = await this.userRepository.getUserByUsername(
-        username.toLowerCase(),
-      );
-      console.log(':::::::::: 1.');
-      if (!existingUser) {
-        const payload = {
-          ...userPayload,
-          tsid: generateTSID(),
-          username: username.toLowerCase(),
-        };
-        console.log(':::::::::: 2.');
-        await this.userRepository.createUser(payload);
-      } else {
-        console.log(':::::::::: 3.');
-        const payload = {
-          ...userPayload,
-          username: username.toLowerCase(),
-        };
-        console.log(payload);
-        await this.userRepository.updateUser(username.toLowerCase(), payload);
-      }
+      const payload = { sub: userPayload?.tsid };
+      const sys_access_token = await this.jwtService.signAsync(payload, {
+        secret: jwtConstants.secret,
+        expiresIn: '60m',
+      });
 
       return {
         msg: 'Success',
+        access_token: sys_access_token,
       };
     } catch (e) {
       console.log(':::::::::: ', e);
-      throw new BadRequestException('An error occured!');
+      throw new BadRequestException('Resource not found!');
     }
   }
   create() {
