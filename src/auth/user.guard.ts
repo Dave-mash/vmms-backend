@@ -5,10 +5,10 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import axios from 'axios';
 import { Request } from 'express';
 // import { generateTSID } from 'packages/shared-packages/src/utils';
 import { PrismaService } from 'src/prisma.service';
+import { githubLogin } from 'src/utils/auth';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -28,17 +28,8 @@ export class UserGuard implements CanActivate {
       switch (auth_type) {
         case 'github':
           console.log('GITHUB');
-          // const access_token = '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';
-          const githubProfileURL = 'https://api.github.com/user';
-          const headers = {
-            headers: {
-              Accept: 'application/vnd.github+json',
-              Authorization: `Bearer ${access_token}`,
-              'X-GitHub-Api-Version': '2022-11-28',
-            },
-          };
-          const response = await axios.get(githubProfileURL, headers);
-          // console.log('::::::::: HERE IS THE RESOPONSE: ', response);
+          const response: { data: { login: string } } | any =
+            await githubLogin(access_token);
           const { login } = response?.data;
           username = login;
 
@@ -59,22 +50,6 @@ export class UserGuard implements CanActivate {
       });
       if (!current_user) {
         throw new NotFoundException("Failed! Seems you don't have an account");
-        //   const data = {
-        //     tsid: generateTSID(),
-        //     username: username.toLowerCase(),
-        //     full_name,
-        //   };
-        //   current_user = await this.prismaService?.user_profile?.create({
-        //     data: { ...data },
-        //   });
-        //   const { tsid: link_user } = current_user;
-        //   await this.prismaService.user_role.create({
-        //     data: {
-        //       link_user,
-        //       tsid: generateTSID(),
-        //       role_type: 'Admin',
-        //     },
-        //   });
       }
 
       request['current_user'] = current_user;

@@ -12,6 +12,7 @@ import {
   UseGuards,
   Body,
   ValidationPipe,
+  Headers,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
@@ -34,9 +35,13 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @UsePipes(new ValidationPipe())
   @Post('user/create')
-  async userRegistration(@Body() body: CreateUserDto) {
-    const newUser = await this.authService.registerUser(body);
+  async userRegistration(
+    @Body() body: CreateUserDto,
+    @Headers('sso-token') authToken: string,
+  ) {
+    const newUser = await this.authService.registerUser(body, authToken);
 
     return newUser;
   }

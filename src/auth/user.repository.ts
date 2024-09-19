@@ -52,6 +52,9 @@ export class UserRepository {
     phone: string,
     username: string,
   ): Promise<user_profile | null> {
+    if (!phone || !username) {
+      return null;
+    }
     const user = await this.app.user_profile.findFirst({
       where: {
         OR: [{ phone }, { username }],

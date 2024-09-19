@@ -9,6 +9,7 @@ import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { generateTSID } from 'packages/shared-packages/src/utils';
+import { githubLogin } from 'src/utils/auth';
 
 @Injectable()
 export class AuthService {
@@ -41,20 +42,30 @@ export class AuthService {
       throw new BadRequestException('Resource not found!');
     }
   }
-  async registerUser(userPayload: any) {
-    const { username, phone } = userPayload;
+  async registerUser(userPayload: any, authToken: string) {
+    if (authToken) {
+      const response: { data: { login: string } } | any =
+        await githubLogin(authToken);
+      const { login } = response?.data;
+
+      userPayload['username'] = login;
+    }
     const existingUser = await this.userRepository.getUserByUsernameOrPhone(
-      phone,
-      username,
+      userPayload['phone'],
+      userPayload['username'],
     );
     if (existingUser) {
       throw new ConflictException('User already exists. Try to log in.');
     }
 
     userPayload['tsid'] = generateTSID();
+    userPayload['password'] = await this.hashPassword(userPayload['password']);
     const newUser = await this.userRepository.createUser(userPayload);
 
-    return newUser;
+    return {
+      ...newUser,
+      password: null,
+    };
   }
   async registerSubUser(current_user, userPayload: any) {
     try {
