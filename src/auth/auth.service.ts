@@ -25,9 +25,19 @@ export class AuthService {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async userLogin(userPayload: any) {
+  async userLogin(
+    currentUser: any,
+    userPayload: { username: string; password: string },
+  ) {
     try {
-      const payload = { sub: userPayload?.tsid };
+      const pass1 = userPayload?.password;
+      const pass2 = currentUser?.password;
+      const isPasswordMatch = await this.decodePassword(pass1, pass2);
+      if (!isPasswordMatch) {
+        throw new BadRequestException('Failed! Check username/password');
+      }
+
+      const payload = { sub: currentUser?.tsid };
       const sys_access_token = await this.jwtService.signAsync(payload, {
         secret: jwtConstants.secret,
         expiresIn: '60m',
@@ -39,7 +49,7 @@ export class AuthService {
       };
     } catch (e) {
       console.log(':::::::::: ', e);
-      throw new BadRequestException('Resource not found!');
+      throw e;
     }
   }
   async registerUser(userPayload: any, authToken: string) {
@@ -52,13 +62,14 @@ export class AuthService {
     }
     const existingUser = await this.userRepository.getUserByUsernameOrPhone(
       userPayload['phone'],
-      userPayload['username'],
+      userPayload['username'].toLowerCase(),
     );
     if (existingUser) {
       throw new ConflictException('User already exists. Try to log in.');
     }
 
     userPayload['tsid'] = generateTSID();
+    userPayload['username'] = userPayload['username'].toLowerCase();
     userPayload['password'] = await this.hashPassword(userPayload['password']);
     const newUser = await this.userRepository.createUser(userPayload);
 
@@ -80,7 +91,8 @@ export class AuthService {
         throw new ForbiddenException('Action not allowed!');
       }
 
-      const { username, phone, password } = userPayload;
+      const { phone, password, full_name } = userPayload;
+      const username = userPayload?.username.toLowerCase();
       const existingUser = await this.userRepository.getUserByUsernameOrPhone(
         phone,
         username,
@@ -90,11 +102,17 @@ export class AuthService {
       }
 
       const finalUserPayload = {
-        ...userPayload,
+        full_name,
+        phone,
+        username,
         password: await this.hashPassword(password),
         tsid: generateTSID(),
       };
-      const newUser = await this.userRepository.createUser(finalUserPayload);
+      const newUser = await this.userRepository.createUser(
+        finalUserPayload,
+        userPayload?.role_type,
+        organisation?.tsid,
+      );
 
       return newUser;
     } catch (e) {

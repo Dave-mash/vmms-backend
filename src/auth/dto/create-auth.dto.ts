@@ -36,3 +36,12 @@ export class CreateSubUserDto {
   @IsNotEmpty()
   role_type: string;
 }
+
+export class LoginUserDto {
+  @IsString()
+  @IsNotEmpty()
+  username: string;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}

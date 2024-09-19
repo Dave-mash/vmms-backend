@@ -10,6 +10,7 @@ export class UserRepository {
   async createUser(
     data: any,
     role_type = 'Admin',
+    link_organisation = '',
   ): Promise<user_profile | null> {
     const user = await this.app?.user_profile?.create({
       data: { ...data },
@@ -21,6 +22,7 @@ export class UserRepository {
           link_user,
           tsid: generateTSID(),
           role_type,
+          link_organisation,
         },
       });
     }

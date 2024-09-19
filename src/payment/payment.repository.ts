@@ -17,4 +17,15 @@ export class PaymentRepository {
 
     return payment;
   }
+
+  async updatePayment(tsid: string, data: any): Promise<payment | null> {
+    const payment = await this.prismaService?.payment?.update({
+      where: { tsid },
+      data: {
+        ...data,
+      },
+    });
+
+    return payment;
+  }
 }

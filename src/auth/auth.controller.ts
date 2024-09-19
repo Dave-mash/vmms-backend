@@ -17,7 +17,11 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { UserGuard } from './user.guard';
-import { CreateSubUserDto, CreateUserDto } from './dto/create-auth.dto';
+import {
+  CreateSubUserDto,
+  CreateUserDto,
+  LoginUserDto,
+} from './dto/create-auth.dto';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Controller('auth')
@@ -27,9 +31,9 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(UserGuard)
   @Post('login')
-  async userLogin(@Request() req: any) {
-    const current_user = req?.current_user;
-    const newUser = await this.authService.userLogin(current_user);
+  async userLogin(@Request() req: any, @Body() body: LoginUserDto) {
+    const currentUser = req?.current_user;
+    const newUser = await this.authService.userLogin(currentUser, body);
 
     return newUser;
   }
