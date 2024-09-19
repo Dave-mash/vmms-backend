@@ -22,8 +22,10 @@ model user_profile {
   id                Int      @id @default(autoincrement())
   tsid              String   @unique
   full_name         String   @default("")
+  phone             String   @default("")
   username          String   @unique
   active            Boolean  @default(true)
+  password          String   @unique
   is_email_verified Boolean? @default(false)
   created_at        DateTime @default(now())
   modified_at       DateTime @updatedAt

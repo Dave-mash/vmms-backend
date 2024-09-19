@@ -7,3 +7,32 @@ export class CreateAuthDto {
   @IsString()
   full_name: string;
 }
+
+export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  username: string;
+  @IsString()
+  full_name: string;
+  @IsString()
+  phone: string;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
+
+export class CreateSubUserDto {
+  @IsString()
+  @IsNotEmpty()
+  username: string;
+  @IsString()
+  full_name: string;
+  @IsString()
+  phone: string;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+  @IsString()
+  @IsNotEmpty()
+  role_type: string;
+}

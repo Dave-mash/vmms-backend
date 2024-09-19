@@ -6,15 +6,17 @@ import {
   Param,
   Delete,
   Request,
+  UsePipes,
   HttpStatus,
   HttpCode,
   UseGuards,
-  Res,
+  Body,
+  ValidationPipe,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { UserGuard } from './user.guard';
+import { CreateSubUserDto, CreateUserDto } from './dto/create-auth.dto';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Controller('auth')
@@ -27,12 +29,28 @@ export class AuthController {
   async userLogin(@Request() req: any) {
     const current_user = req?.current_user;
     const newUser = await this.authService.userLogin(current_user);
-    // response.cookie('vmms:session', 'your_token_value', {
-    //   httpOnly: false, // Set to true if you want it to be HttpOnly
-    //   secure: false, // Set to true in production if using HTTPS
-    //   maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
-    //   path: '/', // Path for which the cookie is valid
-    // });
+
+    return newUser;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('user/create')
+  async userRegistration(@Body() body: CreateUserDto) {
+    const newUser = await this.authService.registerUser(body);
+
+    return newUser;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Post('sub-user/create')
+  async subUserRegistration(
+    @Body() body: CreateSubUserDto,
+    @Request() req: any,
+  ) {
+    const current_user = req?.current_user;
+    const newUser = await this.authService.registerSubUser(current_user, body);
 
     return newUser;
   }
