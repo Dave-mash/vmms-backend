@@ -32,7 +32,23 @@ spec:
           #   - configMapRef:
           #       name: vmms-backend-config  # Reference to ConfigMap
           #   - secretRef:
-          #       name: vmms-backend-secrets  # Reference to Secret
+          #       name: vmms-backend-secrets  # Reference to Secret    # Set up kubectl with the Kubernetes config
+        - name: Set up kubectl # A Github Action provided by Microsoft Azure to allow one to install and configure a specific version of kubectl (Kubernetes CLI)
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.23.0'
+
+        # Configure kubectl to use the K8s config from GitHub secrets
+        - name: Configure kubectl
+          run: |
+            echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+
+        # Deploy the application to Kubernetes
+        - name: Deploy to Kubernetes
+          run: |
+            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f k8s/service.yaml
+
       
       imagePullSecrets:
       - name: regcred

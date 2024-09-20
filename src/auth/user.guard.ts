@@ -15,21 +15,22 @@ export class UserGuard implements CanActivate {
   constructor(private prismaService: PrismaService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    console.log('HERE WE GO...', request.headers.auth_type);
-    const auth_type = request.headers.auth_type;
-    const access_token = this.extractTokenFromHeader(request);
+    console.log('HERE WE GO...', request.headers['auth-type']);
+    const authType = request.headers['auth-type'];
+    const accessToken = this.extractTokenFromHeader(request);
     let username;
 
-    if (!access_token) {
+    if (!accessToken && !authType) {
+
       throw new UnauthorizedException();
     }
 
     try {
-      switch (auth_type) {
+      switch (authType) {
         case 'github':
           console.log('GITHUB');
           const response: { data: { login: string } } | any =
-            await githubLogin(access_token);
+            await githubLogin(accessToken);
           const { login } = response?.data;
           username = login;
 
@@ -41,7 +42,7 @@ export class UserGuard implements CanActivate {
           break;
         default:
           const data = request.body;
-          username = data?.username;
+          username = data?.username ?? '';
           console.log(':::::::::::::::>>>>>>>>>>> ', data);
           break;
       }
