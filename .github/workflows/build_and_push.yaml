@@ -28,38 +28,14 @@ jobs:
           docker build --no-cache -f ./docker/prod.Dockerfile -t $GHCR_REPOSITORY:$IMAGE_TAG --tag ghcr.io/dave-mash/vmms-backend:latest .
           docker push ghcr.io/dave-mash/vmms-backend:latest
 
-      # - name: SSH into the server and deploy Docker app
-      #   run: |
-      #     sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
-          
-      #     echo ✅ SSH connection successful
+      - name: SSH into the server and configure kubectl to use the K8s config from GitHub secrets
+        run: |
+          sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
 
-      #     # 1. Stop any running container with the name 'vmms-backend'
-      #     running_containers=\$(docker ps -q --filter "name=vmms-backend")
-      #     if [ -n "\$running_containers" ]; then
-      #       echo ✅ Stopping and removing running containers named 'vmms-backend'
-      #       docker stop \$running_containers
-      #       docker rm \$running_containers
-      #     else
-      #       echo ✅ No running containers named 'vmms-backend' found
-      #     fi
-
-      #     # 2. Log in to GitHub Container Registry
-      #     echo ✅ Logging in to GitHub Container Registry
-      #     docker login --username GITHUBUSERNAME --password ${{ secrets.GH_PAT }} ghcr.io
-
-      #     # 3. Pull the latest image from GitHub Container Registry
-      #     echo ✅ Pulling the latest Docker image from GitHub Container Registry
-      #     docker pull ghcr.io/dave-mash/vmms-backend:latest
-
-      #     # 4. Run the latest Docker image
-      #     echo ✅ Running the latest Docker container
-      #     docker run -d --name vmms-backend -p 80:3000 -p 443:443 ghcr.io/dave-mash/vmms-backend:latest
-
-      #     # 5. Clean up dangling images (optional)
-      #     echo ✅ Cleaning up unused Docker images
-      #     docker image prune -f
-
-      #     echo ✅ Deployment successful
-
-      #     exit
+          echo ✅ SSH connection successful
+        # Deploy the application to Kubernetes
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
