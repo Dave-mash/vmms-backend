@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmms-backend
+  namespace: vmms-namespace
+  labels:
+    app: vmms-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vmms-backend
+  template:
+    metadata:
+      labels:
+        app: vmms-backend
+    spec:
+      containers:
+        - name: vmms-backend
+          image: ghcr.io/dave-mash/vmms-backend:latest  # Image name UTC timestamp
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests: #  # Minimum resources required. VPA will adjust these based on load
+              cpu: 500m # 200 milli-CPU
+              memory: 500Mi  # 256 Megabytes
+            limits:
+              cpu: 600m # 500 milli-CPU
+              memory: 900Mi  # 512 Megabytes
+          # envFrom:
+          #   - configMapRef:
+          #       name: vmms-backend-config  # Reference to ConfigMap
+          #   - secretRef:
+          #       name: vmms-backend-secrets  # Reference to Secret    # Set up kubectl with the Kubernetes config
+        - name: Set up kubectl # A Github Action provided by Microsoft Azure to allow one to install and configure a specific version of kubectl (Kubernetes CLI)
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.23.0'
+
+        # Configure kubectl to use the K8s config from GitHub secrets
+        - name: Configure kubectl
+          run: |
+            echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+
+        # Deploy the application to Kubernetes
+        - name: Deploy to Kubernetes
+          run: |
+            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f k8s/service.yaml
+
+      
+      imagePullSecrets:
+      - name: regcred
+#  kubectl apply -f deployment.yaml -n vmms-namespace
