@@ -16,7 +16,7 @@ export class PaymentService {
     try {
       payload['payment_type'] = 'Bank';
       const { transaction_ref_no, amount } = payload;
-      await this.paymentRepository.createPayment(payload);
+      const newPayment = await this.paymentRepository.createPayment(payload);
 
       const org = await this.prismaService.organisation.findFirst({
         where: {
@@ -43,27 +43,36 @@ export class PaymentService {
           }
           // console.log(`${Number(paymentPlan)}`);
         }
+
         if (subscription) {
           const { id } = subscription;
-          const newSubscription = await this.prismaService.subscription.update({
+          await this.prismaService.subscription.update({
             where: { id },
             data: {
               active: true,
               subscription_type: targetPlan.planName,
             },
           });
-          return newSubscription;
+        } else {
+          const subscriptionPayload = {
+            subscription_type: targetPlan.planName,
+            link_organisation: tsid,
+            active: true,
+            tsid: generateTSID(),
+          };
+          await this.prismaService.subscription.create({
+            data: subscriptionPayload,
+          });
         }
 
-        const subscriptionPayload = {
-          subscription_type: targetPlan.planName,
-          link_organisation: tsid,
-          active: true,
-          tsid: generateTSID(),
-        };
-        await this.prismaService.subscription.create({
-          data: subscriptionPayload,
-        });
+        const { tsid: identifier } = newPayment;
+        const updates = { tracked: true };
+        const updatedPayment = await this.paymentRepository.updatePayment(
+          identifier,
+          updates,
+        );
+
+        return updatedPayment;
       }
 
       return {

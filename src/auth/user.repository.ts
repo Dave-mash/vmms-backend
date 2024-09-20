@@ -7,7 +7,11 @@ import { PrismaService } from 'src/prisma.service';
 export class UserRepository {
   constructor(private app: PrismaService) {}
 
-  async createUser(data: any): Promise<user_profile | null> {
+  async createUser(
+    data: any,
+    role_type = 'Admin',
+    link_organisation = '',
+  ): Promise<user_profile | null> {
     const user = await this.app?.user_profile?.create({
       data: { ...data },
     });
@@ -17,7 +21,8 @@ export class UserRepository {
         data: {
           link_user,
           tsid: generateTSID(),
-          role_type: 'Admin',
+          role_type,
+          link_organisation,
         },
       });
     }
@@ -40,6 +45,22 @@ export class UserRepository {
   async getUserByUsername(username: string): Promise<user_profile | null> {
     const user = await this.app?.user_profile?.findUnique({
       where: { username },
+    });
+
+    return user;
+  }
+
+  async getUserByUsernameOrPhone(
+    phone: string,
+    username: string,
+  ): Promise<user_profile | null> {
+    if (!phone || !username) {
+      return null;
+    }
+    const user = await this.app.user_profile.findFirst({
+      where: {
+        OR: [{ phone }, { username }],
+      },
     });
 
     return user;

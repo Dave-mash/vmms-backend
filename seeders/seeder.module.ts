@@ -16,6 +16,8 @@ export class SeederModule {
       full_name: 'Guest',
       tsid: generateTSID(),
       username: 'guest',
+      phone: '0712112112',
+      password: 'Guest',
     };
     let guest = await this.prisma.user_profile.findUnique({
       where: { username: 'guest' },

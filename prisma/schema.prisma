@@ -22,8 +22,10 @@ model user_profile {
   id                Int      @id @default(autoincrement())
   tsid              String   @unique
   full_name         String   @default("")
+  phone             String   @default("")
   username          String   @unique
   active            Boolean  @default(true)
+  password          String   @unique
   is_email_verified Boolean? @default(false)
   created_at        DateTime @default(now())
   modified_at       DateTime @updatedAt
@@ -31,7 +33,7 @@ model user_profile {
 
 model subscription {
   id                Int      @id @default(autoincrement())
-  tsid              String   @default("")
+  tsid              String   @unique
   subscription_type String   @default("") // platinum, gold, silver, bronze
   link_organisation String   @unique // tsid
   active            Boolean  @default(false)
@@ -41,7 +43,7 @@ model subscription {
 
 model user_role {
   id                Int      @id @default(autoincrement())
-  tsid              String   @default("")
+  tsid              String   @unique
   role_type         String   @default("") // Guest | User | Admin
   link_user         String   @unique // tsid
   link_organisation String   @default("")
@@ -51,7 +53,7 @@ model user_role {
 
 model instance {
   id                Int      @id @default(autoincrement())
-  tsid              String   @default("")
+  tsid              String   @unique
   name              String   @default("") // Guest | User | Admin
   vm_id             String   @unique
   description       String   @default("")
@@ -69,7 +71,7 @@ model instance {
 
 model vm_audit_log {
   id            Int      @id @default(autoincrement())
-  tsid          String   @default("")
+  tsid          String   @unique
   activity_type String   @default("") // MOVE | User | Admin
   link_user     String   @default("") // tsid
   link_org      String   @default("") // tsid
@@ -80,7 +82,7 @@ model vm_audit_log {
 
 model payment {
   id                 Int      @id @default(autoincrement())
-  tsid               String   @default("")
+  tsid               String   @unique
   payment_type       String   @default("") // Bank | MPesa
   link_organisation  String   @default("")
   transaction_ref_no String   @default("")
@@ -88,6 +90,7 @@ model payment {
   amount             String   @default("")
   account_no         String   @default("")
   tranCCY            String   @default("")
+  tracked            Boolean  @default(false)
   created_at         DateTime @default(now())
   modified_at        DateTime @updatedAt
 }
