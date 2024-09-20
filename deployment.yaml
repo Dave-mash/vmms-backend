@@ -17,17 +17,17 @@ spec:
     spec:
       containers:
         - name: vmms-backend
-          image: ghcr.io/dave-mash/vmms-backend:latest  # Image name UTC timestamp
+          image: ghcr.io/dave-mash/vmms-backend:latest # Image name UTC timestamp
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
           resources:
             requests: #  # Minimum resources required. VPA will adjust these based on load
               cpu: 500m # 200 milli-CPU
-              memory: 500Mi  # 256 Megabytes
+              memory: 500Mi # 256 Megabytes
             limits:
               cpu: 600m # 500 milli-CPU
-              memory: 900Mi  # 512 Megabytes
+              memory: 900Mi # 512 Megabytes
           # envFrom:
           #   - configMapRef:
           #       name: vmms-backend-config  # Reference to ConfigMap
@@ -38,18 +38,6 @@ spec:
           with:
             version: 'v1.23.0'
 
-        # Configure kubectl to use the K8s config from GitHub secrets
-        - name: Configure kubectl
-          run: |
-            echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
-
-        # Deploy the application to Kubernetes
-        - name: Deploy to Kubernetes
-          run: |
-            kubectl apply -f k8s/deployment.yaml
-            kubectl apply -f k8s/service.yaml
-
-      
       imagePullSecrets:
-      - name: regcred
+        - name: regcred
 #  kubectl apply -f deployment.yaml -n vmms-namespace
