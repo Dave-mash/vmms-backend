@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   HttpStatus,
   HttpCode,
@@ -38,5 +39,22 @@ export class VMInstanceController {
     );
 
     return newUser;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @Get()
+  async getInstances(@Request() req: any) {
+    const currentUser = req?.current_user;
+    const {
+      role: { role_type },
+    } = currentUser;
+    const validRoles = ['Admin'];
+    if (!validRoles.includes(role_type)) {
+      throw new BadRequestException('Authorization failure!');
+    }
+    const instances = await this.instanceService.getInstances(currentUser);
+
+    return instances;
   }
 }
