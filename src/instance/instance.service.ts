@@ -46,6 +46,18 @@ export class VMInstanceService {
     }
   }
 
+  async getInstances(current_user) {
+    const {
+      organisation: { tsid },
+    } = current_user;
+
+    const instances =
+      await this.instanceRepository.getInstanceByOrganisation(tsid);
+    console.log(':::::: ', instances);
+
+    return instances;
+  }
+
   async moveInstance() {
     try {
       // Shedule background process

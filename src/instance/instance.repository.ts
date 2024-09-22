@@ -36,4 +36,14 @@ export class VMInstanceRepository {
 
     return instance;
   }
+
+  async getInstanceByOrganisation(
+    link_organisation: string,
+  ): Promise<instance[] | null> {
+    const instances = await this.app?.instance?.findMany({
+      where: { link_organisation },
+    });
+
+    return instances;
+  }
 }
