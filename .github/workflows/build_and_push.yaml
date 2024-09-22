@@ -36,7 +36,7 @@ jobs:
       - name: SSH into the server and configure kubectl to use the K8s config from GitHub secrets
         run: |
           sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
-          mkdir -p $HOME/.kube  # Create .kube directory if it doesn't exist
+          sudo mkdir -p $HOME/.kube  # Create .kube directory if it doesn't exist
           echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
           export KUBECONFIG=$HOME/.kube/config
           kubectl config use-context vmms  # Switch to the desired context
