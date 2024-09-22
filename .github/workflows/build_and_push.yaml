@@ -48,7 +48,7 @@ jobs:
           kubectl config use-context vmms  # Switch to the desired context
           echo "Getting nodes..."
           kubectl get nodes  # Test if kubectl is working
-          kubectl config set-cluster default --server=https://102.209.68.72:6443
+          kubectl config set-cluster default --server=https://102.209.68.72:6443 –insecure-skip-tls-verify=true
           echo "Cluster IP set!"
           EOF
         # Deploy the application to Kubernetes
