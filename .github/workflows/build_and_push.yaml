@@ -28,10 +28,10 @@ jobs:
           docker build --no-cache -f ./docker/prod.Dockerfile -t $GHCR_REPOSITORY:$IMAGE_TAG --tag ghcr.io/dave-mash/vmms-backend:latest .
           docker push ghcr.io/dave-mash/vmms-backend:latest
         
-      - name: Set up kubectl # A Github Action provided by Microsoft Azure to allow one to install and configure a specific version of kubectl (Kubernetes CLI)
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.23.0'
+      # - name: Set up kubectl # A Github Action provided by Microsoft Azure to allow one to install and configure a specific version of kubectl (Kubernetes CLI)
+      #   uses: azure/setup-kubectl@v3
+      #   with:
+      #     version: 'v1.23.0'
 
       - name: SSH into the server and configure kubectl to use the K8s config from GitHub secrets
         run: |
