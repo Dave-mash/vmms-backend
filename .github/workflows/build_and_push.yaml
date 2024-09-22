@@ -42,6 +42,7 @@ jobs:
           export KUBECONFIG=~/.kube/config
           kubectl config view          
           kubectl get nodes  # Test if kubectl is working
+          kubectl config set-cluster default --server=https://102.209.68.72:6443
           EOF
         # Deploy the application to Kubernetes
       - name: Deploy to Kubernetes
