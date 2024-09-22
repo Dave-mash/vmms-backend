@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vmms-backend
-  namespace: vmms-namespace
+  namespace: default
   labels:
     app: vmms-backend
 spec:
