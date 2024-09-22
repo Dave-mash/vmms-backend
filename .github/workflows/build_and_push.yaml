@@ -36,14 +36,10 @@ jobs:
       - name: SSH into the server and configure kubectl to use the K8s config from GitHub secrets
         run: |
           sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
-          echo "Creating .kube directory..."
-          echo "Writing kubeconfig..."
+          mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-          echo "Current KUBECONFIG contents:"
-          cat ~/.kube/config  # Print the kubeconfig for verification
-          export KUBECONFIG=~/.kube/config
-          echo "Using context default..."
-          echo "Getting nodes..."
+          echo ✅ SSH connection successful
+          export KUBECONFIG=~/.kube/config          
           kubectl get nodes  # Test if kubectl is working
           EOF
         # Deploy the application to Kubernetes
