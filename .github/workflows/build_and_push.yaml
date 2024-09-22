@@ -39,7 +39,8 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           echo ✅ SSH connection successful
-          export KUBECONFIG=~/.kube/config          
+          export KUBECONFIG=~/.kube/config
+          kubectl config view          
           kubectl get nodes  # Test if kubectl is working
           EOF
         # Deploy the application to Kubernetes
