@@ -30,11 +30,13 @@ export class AuthService {
     userPayload: { username: string; password: string },
   ) {
     try {
-      const pass1 = userPayload?.password;
-      const pass2 = currentUser?.password;
-      const isPasswordMatch = await this.decodePassword(pass1, pass2);
-      if (!isPasswordMatch) {
-        throw new BadRequestException('Failed! Check username/password');
+      if (currentUser?.authType === 'form') {
+        const pass1 = userPayload?.password;
+        const pass2 = currentUser?.password;
+        const isPasswordMatch = await this.decodePassword(pass1, pass2);
+        if (!isPasswordMatch) {
+          throw new BadRequestException('Failed! Check username/password');
+        }
       }
 
       const payload = { sub: currentUser?.tsid };

@@ -31,7 +31,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(UserGuard)
   @Post('login')
-  async userLogin(@Request() req: any, @Body() body: LoginUserDto) {
+  async userLogin(@Request() req: any, @Body() body: LoginUserDto | any) {
     const currentUser = req?.current_user;
     const newUser = await this.authService.userLogin(currentUser, body);
 

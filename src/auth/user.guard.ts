@@ -21,7 +21,6 @@ export class UserGuard implements CanActivate {
     let username;
 
     if (!accessToken && !authType) {
-
       throw new UnauthorizedException();
     }
 
@@ -37,10 +36,10 @@ export class UserGuard implements CanActivate {
           break;
         case 'guest':
           console.log('GUEST');
-          username = 'guest';
+          username = accessToken.toLowerCase();
 
           break;
-        default:
+        case 'form':
           const data = request.body;
           username = data?.username ?? '';
           console.log(':::::::::::::::>>>>>>>>>>> ', data);
@@ -50,9 +49,11 @@ export class UserGuard implements CanActivate {
         where: { username: username.toLowerCase() },
       });
       if (!current_user) {
+        console.log(':::::::CURRENT_USER>', username);
         throw new NotFoundException("Failed! Seems you don't have an account");
       }
 
+      current_user['authType'] = authType;
       request['current_user'] = current_user;
     } catch (e) {
       console.log('::: ERROR: ', e?.response);
