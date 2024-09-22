@@ -43,6 +43,7 @@ jobs:
           echo "Current KUBECONFIG contents:"
           cat ~/.kube/config  # Print the kubeconfig for verification
           export KUBECONFIG=~/.kube/config
+          kubectl config set-context vmms --cluster=k3s --user=default
           echo "Using context vmms..."
           kubectl config use-context vmms  # Switch to the desired context
           echo "Getting nodes..."
