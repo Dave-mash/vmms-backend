@@ -15,6 +15,6 @@ spec:
       port: 443
       targetPort: 3000
       name: https
-  type: LoadBalancer
+  type: ClusterIP
 
 #  kubectl apply -f service.yaml -n vmms-namespace
