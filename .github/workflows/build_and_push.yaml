@@ -37,19 +37,14 @@ jobs:
         run: |
           sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
           echo "Creating .kube directory..."
-          mkdir -p ~/.kube
           echo "Writing kubeconfig..."
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           echo "Current KUBECONFIG contents:"
           cat ~/.kube/config  # Print the kubeconfig for verification
           export KUBECONFIG=~/.kube/config
-          kubectl config set-context vmms --cluster=k3s --user=default
-          echo "Using context vmms..."
-          kubectl config use-context vmms  # Switch to the desired context
+          echo "Using context default..."
           echo "Getting nodes..."
           kubectl get nodes  # Test if kubectl is working
-          kubectl config set-cluster default --server=https://102.209.68.72:6443 –insecure-skip-tls-verify=true
-          echo "Cluster IP set!"
           EOF
         # Deploy the application to Kubernetes
       - name: Deploy to Kubernetes
