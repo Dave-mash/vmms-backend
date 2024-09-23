@@ -37,15 +37,16 @@ jobs:
         run: |
           sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
           echo ✅ SSH connection successful
-          export KUBECONFIG=~/.kube/config
+          kubectl apply -f vmms-deployments/vmms-backend/deployment.yaml
+          kubectl apply -f vmms-deployments/vmms-backend/service.yaml
           kubectl config view          
           kubectl get nodes  # Test if kubectl is working
           EOF
-        # Deploy the application to Kubernetes
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/deployment.yaml --validate=false
-          kubectl apply -f k8s/service.yaml --validate=false
+      #   # Deploy the application to Kubernetes
+      # - name: Deploy to Kubernetes
+      #   run: |
+      #     kubectl apply -f k8s/deployment.yaml --validate=false
+      #     kubectl apply -f k8s/service.yaml --validate=false
 
       # - name: Check deployment status
       #   run: |
