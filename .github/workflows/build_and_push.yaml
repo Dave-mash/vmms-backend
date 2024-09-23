@@ -37,8 +37,11 @@ jobs:
         run: |
           sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
           echo ✅ SSH connection successful
+          docker pull ghcr.io/dave-mash/vmms-backend:latest
+          echo ✅ docker pull successful
           kubectl apply -f vmms-deployments/vmms-backend/deployment.yaml
           kubectl apply -f vmms-deployments/vmms-backend/service.yaml
+          Deployed ✅
           kubectl config view          
           kubectl get nodes  # Test if kubectl is working
           EOF
