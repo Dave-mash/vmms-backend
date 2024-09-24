@@ -36,19 +36,20 @@ jobs:
       - name: SSH into the server and configure kubectl to use the K8s config from GitHub secrets
         run: |
           sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           echo ✅ SSH connection successful
-          export KUBECONFIG=~/.kube/config
+          docker pull ghcr.io/dave-mash/vmms-backend:latest
+          echo ✅ docker pull successful
+          kubectl apply -f vmms-deployments/vmms-backend/deployment.yaml
+          kubectl apply -f vmms-deployments/vmms-backend/service.yaml
+          Deployed ✅
           kubectl config view          
           kubectl get nodes  # Test if kubectl is working
-          kubectl config set-cluster default --server=https://102.209.68.72:6443
           EOF
-        # Deploy the application to Kubernetes
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/deployment.yaml --validate=false
-          kubectl apply -f k8s/service.yaml --validate=false
+      #   # Deploy the application to Kubernetes
+      # - name: Deploy to Kubernetes
+      #   run: |
+      #     kubectl apply -f k8s/deployment.yaml --validate=false
+      #     kubectl apply -f k8s/service.yaml --validate=false
 
       # - name: Check deployment status
       #   run: |
