@@ -41,9 +41,12 @@ jobs:
           echo ✅ docker pull successful
           kubectl apply -f vmms-deployments/vmms-backend/deployment.yaml
           kubectl apply -f vmms-deployments/vmms-backend/service.yaml
-          Deployed ✅
+          echo Deployed ✅
           kubectl config view          
           kubectl get nodes  # Test if kubectl is working
+          echo "Restarting the deployment..."
+          kubectl rollout restart deployment/vmms-backend
+          echo Done ✅
           EOF
       #   # Deploy the application to Kubernetes
       # - name: Deploy to Kubernetes
