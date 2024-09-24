@@ -28,16 +28,21 @@ jobs:
           docker build --no-cache -f ./docker/prod.Dockerfile -t $GHCR_REPOSITORY:$IMAGE_TAG --tag ghcr.io/dave-mash/vmms-backend:latest .
           docker push ghcr.io/dave-mash/vmms-backend:latest
         
-      - name: Set up kubectl # A Github Action provided by Microsoft Azure to allow one to install and configure a specific version of kubectl (Kubernetes CLI)
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.23.0'
+      # - name: Set up kubectl # A Github Action provided by Microsoft Azure to allow one to install and configure a specific version of kubectl (Kubernetes CLI)
+      #   uses: azure/setup-kubectl@v3
+      #   with:
+      #     version: 'v1.23.0'
 
       - name: SSH into the server and configure kubectl to use the K8s config from GitHub secrets
         run: |
           sshpass -p ${{ secrets.VM_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USERNAME }}@${{ secrets.VM_ADDRESS }} -p ${{ secrets.VM_PORT }} << EOF
-          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           echo ✅ SSH connection successful
+          export KUBECONFIG=~/.kube/config
+          kubectl config view          
+          kubectl get nodes  # Test if kubectl is working
+          kubectl config set-cluster default --server=https://102.209.68.72:6443
           EOF
         # Deploy the application to Kubernetes
       - name: Deploy to Kubernetes
@@ -48,4 +53,3 @@ jobs:
       # - name: Check deployment status
       #   run: |
       #     kubectl rollout status deployment/vmms-backend -n vmms-namespace
-
